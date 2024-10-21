@@ -1,4 +1,4 @@
-namespace IrisChat.Models
+namespace IrisChat.Data.Models
 {
     public class ErrorViewModel
     {
