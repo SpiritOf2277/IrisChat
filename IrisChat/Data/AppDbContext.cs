@@ -1,15 +1,15 @@
 ﻿using IrisChat.Data.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace IrisChat.Data
 {
-    public class AppDbContext : DbContext
+    public class AppDbContext : IdentityDbContext<User>
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
-        {
-        }
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-        public DbSet<User> Users { get; set; }
+        protected AppDbContext() { }
+
         public DbSet<ForumThread> ForumThreads { get; set; }
         public DbSet<Post> Posts { get; set; }
         public DbSet<Category> Categories { get; set; }
@@ -17,6 +17,8 @@ namespace IrisChat.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<User>().ToTable("AspNetUsers");
 
             modelBuilder.Entity<User>().HasQueryFilter(u => !u.IsDeleted);
             modelBuilder.Entity<ForumThread>().HasQueryFilter(t => !t.IsDeleted);
