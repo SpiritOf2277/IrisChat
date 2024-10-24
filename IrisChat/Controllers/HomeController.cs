@@ -1,32 +1,39 @@
+﻿using IrisChat.Data.Entities;
+using IrisChat.Data.Interfaces;
 using IrisChat.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace IrisChat.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly IRepository<ForumThread> _forumThreadRepository;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(IRepository<ForumThread> forumThreadRepository)
         {
-            _logger = logger;
+            _forumThreadRepository = forumThreadRepository;
         }
 
-        public IActionResult Index()
+        [HttpGet]
+        public async Task<IActionResult> Index()
         {
-            return View();
-        }
+            var forumThreads = await _forumThreadRepository.GetAllAsync();
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
+            var model = forumThreads.Select(thread => new ForumThreadCardViewModel
+            {
+                Id = thread?.Id ?? "No ID",
+                Title = thread?.Title ?? "No Title",
+                Content = thread?.Content ?? "No Content",
+                CategoryName = thread.Category?.Name ?? "No Category",
+                CreatedAt = thread?.CreatedAt ?? DateTime.Now
+            }).ToList();
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+
+            return View(model);
         }
     }
 }
+

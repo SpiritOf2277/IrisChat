@@ -48,5 +48,10 @@ namespace IrisChat.Data.Repositorys
                 await _context.SaveChangesAsync();
             }
         }
+
+        public async Task<IEnumerable<Post>> GetAllAsync()
+        {
+            return await _context.Posts.ToListAsync();
+        }
     }
 }

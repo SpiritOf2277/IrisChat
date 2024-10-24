@@ -1,0 +1,41 @@
+﻿@model IrisChat.Models.ForumThreadDetailsViewModel
+
+<div class="container">
+    <h2>@Model.Title</h2>
+    <p>@Model.Content</p>
+    <p><small>By @Model.AuthorName, on @Model.CreatedAt.ToString("g")</small></p>
+
+    <hr />
+
+    <h3>Posts</h3>
+
+    @if (Model.Posts.Any()) {
+        foreach (var post in Model.Posts) {
+            <div class="card mb-3">
+                <div class="card-body">
+                    <p>@post.Content</p>
+                    <p><small>By @post.AuthorName, on @post.CreatedAt.ToString("g")</small></p>
+                </div>
+            </div>
+        }
+    } else {
+        <p>No posts yet. Be the first to comment!</p>
+    }
+
+    <hr />
+
+    @if (User.Identity.IsAuthenticated) {
+        <h4>Leave a reply</h4>
+
+        <form asp-action="AddPost" asp-controller="ForumThread" method="post">
+            <input type="hidden" asp-for="Id" value="@Model.Id" name="ForumThreadId" />
+            <div class="form-group">
+                <textarea name="Content" class="form-control" placeholder="Write your reply..." rows="5"></textarea>
+                <span asp-validation-for="Content" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    } else {
+        <p><a href="/Account/Login">Log in</a> to leave a reply.</p>
+    }
+</div>

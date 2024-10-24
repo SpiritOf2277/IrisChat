@@ -7,5 +7,6 @@
         Task UpdateAsync(T entity);
         Task SoftDeleteAsync(string id);
         Task HardDeleteAsync(string id);
+        Task<IEnumerable<T>> GetAllAsync();
     }
 }

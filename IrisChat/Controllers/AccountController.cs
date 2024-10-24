@@ -56,7 +56,7 @@ public class AccountController : Controller
     public async Task<IActionResult> Register(RegisterViewModel model)
     {
         if (ModelState.IsValid) {
-            // Проверка: существует email
+            // Проверка: существует ли email
             var userWithSameEmail = await _userManager.Users.IgnoreQueryFilters()
             .FirstOrDefaultAsync(u => u.Email == model.Email);
             if (userWithSameEmail != null) {

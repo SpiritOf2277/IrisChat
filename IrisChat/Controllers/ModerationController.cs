@@ -78,7 +78,7 @@ namespace IrisChat.Controllers
         [HttpPost]
         public async Task<IActionResult> RestoreUser(string id)
         {
-            _userRepository.RestoreUserAsync(id);
+            await _userRepository.RestoreUserAsync(id);
             return RedirectToAction("ManageUsers");
         }
     }

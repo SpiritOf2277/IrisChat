@@ -3,9 +3,14 @@ using IrisChat.Data;
 using IrisChat.Data.Entities;
 using Microsoft.AspNetCore.Identity;
 using IrisChat.Data.Repositorys;
+using IrisChat.Data.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Регистрация репозиториев
+builder.Services.AddScoped<IRepository<ForumThread>, ForumThreadRepository>();
+builder.Services.AddScoped<IRepository<Category>, CategoryRepository>();
+builder.Services.AddScoped<IRepository<Post>, PostRepository>();
 builder.Services.AddScoped<UserRepository>();
 
 var connectionString = builder.Configuration.GetConnectionString("IrisChatConnection");
@@ -48,6 +53,7 @@ builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
+// Создание ролей и администратора
 using (var scope = app.Services.CreateScope()) {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
