@@ -2,8 +2,11 @@
 using IrisChat.Data;
 using IrisChat.Data.Entities;
 using Microsoft.AspNetCore.Identity;
+using IrisChat.Data.Repositorys;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddScoped<UserRepository>();
 
 var connectionString = builder.Configuration.GetConnectionString("IrisChatConnection");
 
@@ -41,22 +44,23 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = "/Account/AccessDenied";
 });
 
-// Создание ролей и администратора при запуске приложения
+builder.Services.AddControllersWithViews();
+
+var app = builder.Build();
+
 using (var scope = app.Services.CreateScope()) {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
 
-    // Список ролей, которые ты хочешь создать
     string[] roleNames = { "Admin", "Moderator", "User" };
 
     foreach (var roleName in roleNames) {
         if (!await roleManager.RoleExistsAsync(roleName)) {
-            // Создание роли, если она еще не существует
             await roleManager.CreateAsync(new IdentityRole(roleName));
         }
     }
 
-    // Создание пользователя-администратора, если его еще нет
+    // Создание администратора
     var adminEmail = "admin@example.com";
     var adminUser = await userManager.FindByEmailAsync(adminEmail);
 
@@ -68,17 +72,12 @@ using (var scope = app.Services.CreateScope()) {
             DisplayName = "Admin"
         };
 
-        var createUserResult = await userManager.CreateAsync(user, "AdminPassword123!"); // Установи безопасный пароль
+        var createUserResult = await userManager.CreateAsync(user, "AdminPassword123!");
         if (createUserResult.Succeeded) {
-            // Назначение роли Admin новому пользователю
             await userManager.AddToRoleAsync(user, "Admin");
         }
     }
 }
-
-builder.Services.AddControllersWithViews();
-
-var app = builder.Build();
 
 if (!app.Environment.IsDevelopment()) {
     app.UseExceptionHandler("/Home/Error");

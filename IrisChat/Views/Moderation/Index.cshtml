@@ -1,0 +1,19 @@
+﻿@{
+    ViewData["Title"] = "Moderation Dashboard";
+}
+
+<h2>Moderation Dashboard</h2>
+
+<p>Добро пожаловать на панель модерации. Выберите действие:</p>
+
+<ul>
+    <li><a href="@Url.Action("ManagePosts", "Moderation")">Управление постами</a></li>
+    <li><a href="@Url.Action("ManageUsers", "Moderation")">Управление пользователями</a></li>
+</ul>
+
+@if (User.IsInRole("Admin")) {
+    <h3>Административные действия</h3>
+    <ul>
+        <li><a href="@Url.Action("AdminAction", "Moderation")">Административные функции</a></li>
+    </ul>
+}

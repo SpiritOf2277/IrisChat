@@ -1,7 +1,8 @@
 ﻿using IrisChat.Data.Entities;
 using IrisChat.Data.Interfaces;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace IrisChat.Data.Repositorys
 {
@@ -31,6 +32,11 @@ namespace IrisChat.Data.Repositorys
             await _context.SaveChangesAsync();
         }
 
+        public async Task<IEnumerable<User>> GetAllUsersAsync()
+        {
+            return await _context.Users.ToListAsync();
+        }
+
         public async Task SoftDeleteAsync(string id)
         {
             var user = await _context.Users.FindAsync(id);
@@ -46,6 +52,44 @@ namespace IrisChat.Data.Repositorys
             var user = await _context.Users.FindAsync(id);
             if (user != null) {
                 _context.Users.Remove(user);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task BanUserAsync(string id, int days)
+        {
+            var user = await _context.Users.FindAsync(id);
+            if (user != null) {
+                user.IsBanned = true;
+                user.BanEndDate = DateTime.UtcNow.AddDays(days);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task ChangeUserRoleAsync(User user, string currentRole, string newRole)
+        {
+            var userManager = _context.GetService<UserManager<User>>();
+
+            if (await userManager.IsInRoleAsync(user, currentRole)) {
+                await userManager.RemoveFromRoleAsync(user, currentRole);
+            }
+            await userManager.AddToRoleAsync(user, newRole);
+        }
+
+        public async Task<IEnumerable<User>> GetAllUsersWithDeletedAsync()
+        {
+            return await _context.Users.IgnoreQueryFilters().ToListAsync();
+        }
+
+        public async Task RestoreUserAsync(string id)
+        {
+            var user = await _context.Users
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+            if (user != null) {
+                user.IsDeleted = false;
+                user.DeletedAt = null;
                 await _context.SaveChangesAsync();
             }
         }

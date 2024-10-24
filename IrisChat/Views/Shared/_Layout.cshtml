@@ -18,7 +18,13 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav me-auto">
-                        <!-- Здесь можно добавить ссылки на другие страницы -->
+                        
+                        @if (User.IsInRole("Moderator") || User.IsInRole("Admin")) {
+                            <li class="nav-item">
+                                <a class="nav-link" href="@Url.Action("Index", "Moderation")">Moderation</a>
+                            </li>
+                        }
+
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
